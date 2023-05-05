@@ -1,0 +1,52 @@
+1. Start game
+  -Have game load and initialized, prepared for first move
+  -Organize necessary variables and event listeners
+
+2. Be notified of which player's turn it is
+  -Create a variable for whose turn it is
+    -As soon as one player goes, update variable to the other player
+
+3. Be able to move a piece by clicking on it
+  -Create a class for the pieces
+    -Create an array for storage of user's pieces
+    -Create a property for the current position of all the pieces
+    -Loop through all of the user's pieces
+      -Need event listener for each one
+  -If a piece is chosen, assign it to a variable "chosenPiece"
+    -If piece is moved, change the position property for that piece
+  -Render the board to display new positioning of the chosen piece
+
+4. Be able to only make valid moves
+  -Create object to show possible moves
+    -All valid squares can be represented by a number
+  -Create array for available moves
+  -Create array for moves that could result in capturing opponent's piece
+  -Loop through each piece to find which squares are viable moves
+    -Separate arrays for each player
+  -Loop through the possible moves returned to check if opponent has a piece on that square
+    -Look for possible captures of opponent's pieces
+      -If no possible captures, loop through returned moves to check for empty squares
+  -After a move is made, check for a captured piece
+    -If yes, check for more possible captures with the chosen piece
+  -If no possible moves are left, the game is over
+
+5. Captured pieces are removed
+  -Each piece will be given property "isInPlay" with a default "true"
+    -"isInPlay" will be set to false if a piece has been captured
+  -Piece's location will have to be "null"
+  -Render board to no longer show the piece that was just captured
+
+6. Pieces that reach back row turn "king"
+  -Every piece gets "isKing" property, with default false setting
+    -turns true if piece reaches opponent's back row
+
+7. Check for finished game 
+  -Loop through every avialble piece for any possible remaining moves
+    -If no moves are left, end loop for the game
+  -Loop through to see if all pieces for a user have been captured
+    -If no pieces are left, end loop for the game
+  -Display winner message
+
+8. Restart game button
+  -Add event listener to "Restart" button
+    -Resets the loop of the game
