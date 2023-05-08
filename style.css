@@ -1,3 +1,70 @@
-body{
-  background: red;
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+:root {
+  --dark-square-color: black;
+  --player-two-piece-color: white;
+  --player-one-piece-color: red;
+}
+
+#player-one {
+  position: absolute;
+  top: 3.2rem;
+  right: 3.2rem;;
+}
+
+#player-two {
+  position: absolute;
+  bottom: 3.2rem;
+  left: 3.2rem;
+}
+
+#restart-button {
+  position: absolute;
+  bottom: 3.2rem;
+  right: 3.2rem;
+}
+
+.board-container {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  width: 80vh;
+  height: 80vh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid black;
+}
+
+.square {
+  border: 1px solid black;
+}
+
+.square[id] {
+  background-color: var(--dark-square-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.piece {
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+}
+
+.player-one-piece {
+  background-color: var(--player-one-piece-color);
+}
+
+.player-two-piece {
+  background-color: var(--player-two-piece-color);
 }
