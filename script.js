@@ -3,6 +3,9 @@ const squares = document.querySelectorAll(".square");
 const playerOnePieces = []
 const playerTwoPieces = []
 
+let player = 0
+let chosenPiece = null
+
 class PlayerPiece {
   constructor(currentSquare) {
     this.currentSquare = currentSquare
@@ -81,9 +84,74 @@ const renderBoard = () => {
   }
 }
 
+const generateAvailableMoves = (currentPlayerPieces, opponentPieces) => {
+  const totalPieces = currentPlayerPieces.concat(opponentPieces)
+  for(piece of totalPieces) {
+    piece.captures = []
+    piece.availableMoves = []
+  }
+  for(let piece of currentPlayerPieces) {
+  }
+  if(currentPlayerPieces.every(piece => piece.captures.length === 0)) {
+    for(let piece of currentPlayerPieces) {
+      for(let square of availableMovesForSquares[piece.currentSquare][player]) {
+        if(square) {
+          if(totalPieces.every(piece => piece.currentSquare !== `s${square}`)) {
+            piece.availableMoves.push(square)
+          }
+        }
+      }
+    }
+  }
+}
+
+const createPieceEventListeners = () => {
+  const pieces = document.querySelectorAll(".piece")
+  for(let piece of pieces) {
+    piece.addEventListener("click", (e) => {
+      event.stopPropagation()
+      selection = piece.parentElement.id
+      for(let piece of playerOnePieces.concat(playerTwoPieces)) {
+        if(piece.currentSquare === selection){
+          chosenPiece = piece
+        }
+      }
+    })
+  }
+}
+
+const createSquareEventListeners = () => {
+  for(let square of squares) {
+    square.addEventListener("click", ()=> {
+      if(chosenPiece) {
+        if(chosenPiece.availableMoves.includes(parseInt(square.id.slice(1)))) {
+          chosenPiece.currentSquare = square.id
+          renderBoard()
+          chosenPiece = null
+          createPieceEventListeners()
+          switchTurn()
+        }
+      }
+    })
+  }
+}
+
+const switchTurn = () => {
+  if(player === 0) {
+    player = 1
+    generateAvailableMoves(playerTwoPieces, playerOnePieces)
+  } else {
+    player = 0
+    generateAvailableMoves(playerOnePieces, playerTwoPieces)
+  }
+}
+
 const initialize = () => {
   createUserPieces()
   renderBoard()
+  createPieceEventListeners()
+  createSquareEventListeners()
+  generateAvailableMoves(playerOnePieces, playerTwoPieces)
 }
 
 initialize()
