@@ -11,7 +11,7 @@ class PlayerPiece {
     this.currentSquare = currentSquare
     this.isInPlay = true
     this.isNowKing = false
-    this.captures = []
+    this.captures = null
     this.availableMoves = []
   }
 }
@@ -66,7 +66,7 @@ const renderBoard = () => {
   squares.forEach(square => {
     square.innerHTML = ""
   })
-    for(let piece of playerOnePieces) {
+  for(let piece of playerOnePieces) {
     if(piece.isInPlay) {
       const playerPiece = document.createElement("div")
       const square = document.querySelector(`#${piece.currentSquare}`)
@@ -87,12 +87,55 @@ const renderBoard = () => {
 const generateAvailableMoves = (currentPlayerPieces, opponentPieces) => {
   const totalPieces = currentPlayerPieces.concat(opponentPieces)
   for(piece of totalPieces) {
-    piece.captures = []
     piece.availableMoves = []
+    piece.captures = {}
   }
   for(let piece of currentPlayerPieces) {
+    for(let square of availableMovesForSquares[piece.currentSquare][player]) {
+      if(square) {
+        if(opponentPieces.some(piece => piece.currentSquare === `s${square}`)) {
+          if(availableMovesForSquares[piece.currentSquare][player].indexOf(square) === 0) {
+            if(player === 0) {
+              const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) - 9}`
+              const edgePieces = ["s9", "s17", "s25"]
+              if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
+                if(!edgePieces.includes(piece.currentSquare)) {
+                  piece.captures[parseInt(piece.currentSquare.slice(1)) - 9] = availableMovesForSquares[piece.currentSquare][player][0]
+                }
+              }
+            } else {
+              const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) + 7}`
+              const edgePieces = ["s1", "s9", "s17", "s25"]
+              if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
+                if(!edgePieces.includes(piece.currentSquare)){
+                  piece.captures[parseInt(piece.currentSquare.slice(1)) + 7] = availableMovesForSquares[piece.currentSquare][player][0]
+                }
+              }
+            }
+          } else { 
+            if(player === 0) {
+              const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) - 7}`
+              const edgePieces = ["s8", "s16", "s24", "s32"]
+              if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
+                if(!edgePieces.includes(piece.currentSquare)) {
+                  piece.captures[parseInt(piece.currentSquare.slice(1)) - 7] = availableMovesForSquares[piece.currentSquare][player][1]
+                }
+              }
+            } else {
+              const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) + 9}`
+              const edgePieces = ["s8", "s16", "s24"]
+              if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
+                if(!edgePieces.includes(piece.currentSquare)) {
+                  piece.captures[parseInt(piece.currentSquare.slice(1)) + 9] = availableMovesForSquares[piece.currentSquare][player][1]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
-  if(currentPlayerPieces.every(piece => piece.captures.length === 0)) {
+  if(currentPlayerPieces.every(piece => Object.keys(piece.captures).length === 0)) {
     for(let piece of currentPlayerPieces) {
       for(let square of availableMovesForSquares[piece.currentSquare][player]) {
         if(square) {
@@ -106,25 +149,25 @@ const generateAvailableMoves = (currentPlayerPieces, opponentPieces) => {
 }
 
 const createPieceEventListeners = () => {
-  const pieces = document.querySelectorAll(".piece")
-  for(let piece of pieces) {
-    piece.addEventListener("click", (e) => {
-      event.stopPropagation()
-      selection = piece.parentElement.id
-      for(let piece of playerOnePieces.concat(playerTwoPieces)) {
-        if(piece.currentSquare === selection){
-          chosenPiece = piece
-        }
-      }
-    })
-  }
+    const pieces = document.querySelectorAll(".piece")
+    for(let piece of pieces) {
+        piece.addEventListener("click", (event) => {
+            event.stopPropagation()
+            selection = piece.parentElement.id
+            for(let piece of playerOnePieces.concat(playerTwoPieces)) {
+                if(piece.currentSquare === selection){
+                    chosenPiece = piece
+                }
+            }
+        })
+    }
 }
 
 const createSquareEventListeners = () => {
   for(let square of squares) {
-    square.addEventListener("click", ()=> {
+    square.addEventListener("click", () => {
       if(chosenPiece) {
-        if(chosenPiece.availableMoves.includes(parseInt(square.id.slice(1)))) {
+        if(isLegalMove(chosenPiece, square)) {
           chosenPiece.currentSquare = square.id
           renderBoard()
           chosenPiece = null
@@ -135,9 +178,18 @@ const createSquareEventListeners = () => {
     })
   }
 }
+const isLegalMove = (chosenPiece, square) => {
+  if(Object.keys(chosenPiece.captures).length !== 0) {
+    
+  } else {
+    if(chosenPiece.availableMoves.includes(parseInt(square.id.slice(1)))) {
+      return true
+    }
+  }
+}
 
 const switchTurn = () => {
-  if(player === 0) {
+  if(player === 0){
     player = 1
     generateAvailableMoves(playerTwoPieces, playerOnePieces)
   } else {
@@ -145,6 +197,7 @@ const switchTurn = () => {
     generateAvailableMoves(playerOnePieces, playerTwoPieces)
   }
 }
+
 
 const initialize = () => {
   createUserPieces()
