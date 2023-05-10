@@ -4,6 +4,7 @@ const playerTwo = document.querySelector("#player-two")
 
 let playerOnePieces = []
 let playerTwoPieces = []
+let totalPieces = []
 
 let player = 0
 let chosenPiece = null
@@ -57,10 +58,12 @@ const createUserPieces = () => {
   for(let i = 1; i <= 12; i++) {
     const piece = new PlayerPiece(`s${i}`)
     playerTwoPieces.push(piece)
+    totalPieces.push(piece)
   }
   for(let i = 21; i <= 32; i++) {
     const piece = new PlayerPiece(`s${i}`)
     playerOnePieces.push(piece)
+    totalPieces.push(piece)
   }
 }
 
@@ -95,51 +98,70 @@ const renderBoard = () => {
 }
 
 const generateAvailableMoves = (currentPlayerPieces, opponentPieces) => {
-  const totalPieces = currentPlayerPieces.concat(opponentPieces)
   for(piece of totalPieces) {
     piece.availableMoves = []
     piece.captures = {}
   }
   for(let piece of currentPlayerPieces) {
     if(piece.currentSquare) {
-      for(let square of availableMovesForSquares[piece.currentSquare][player]) {
-        if(square) {
-          if(opponentPieces.some(piece => piece.currentSquare === `s${square}`)) {
-            if(availableMovesForSquares[piece.currentSquare][player].indexOf(square) === 0) {
-              if(player === 0) {
-                const edgePieces = ["s9", "s17", "s25", "s6", "s7", "s8"]
-                const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) - 9}`
-                if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
-                  if(!edgePieces.includes(piece.currentSquare)) {
-                    piece.captures[parseInt(piece.currentSquare.slice(1)) - 9] = availableMovesForSquares[piece.currentSquare][player][0]
-                  }
-                }
-              } else {
-                const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) + 7}`
-                const edgePieces = ["s1", "s9", "s17", "s25", "s26", "s27", "s28"]
-                if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
-                  if(!edgePieces.includes(piece.currentSquare)){
-                    piece.captures[parseInt(piece.currentSquare.slice(1)) + 7] = availableMovesForSquares[piece.currentSquare][player][0]
-                  }
-                }
+      getCaptureMoves(piece, opponentPieces, player)
+      if(piece.isNowKing) {
+        getCaptureMoves(piece, opponentPieces, player - 1)
+      }
+    }
+  }
+  if(currentPlayerPieces.every(piece => Object.keys(piece.captures).length === 0)) {
+    for(let piece of currentPlayerPieces) {
+      if(piece.currentSquare) {
+        getNormalMoves(piece, player)
+        if(piece.isNowKing) {
+          getNormalMoves(piece, player -1)
+        }
+      }
+    }
+  }
+}
+
+const getCaptureMoves = (piece, opponentPieces, index) => {
+  for(let square of availableMovesForSquares[piece.currentSquare].at(index)) {
+    if(square) {
+      if(opponentPieces.some(piece => piece.currentSquare === `s${square}`)) {
+        if(availableMovesForSquares[piece.currentSquare].at(index).indexOf(square) === 0) {
+          if(index === 0) {
+            const edgePieces = ["s9", "s17", "s25", "s6", "s7", "s8"]
+            const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) - 9}`
+            if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
+              if(!edgePieces.includes(piece.currentSquare)) {
+                piece.captures[parseInt(piece.currentSquare.slice(1)) - 9] = availableMovesForSquares[piece.currentSquare].at(index)[0]
               }
-            } else { 
-              if(player === 0) {
-                const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) - 7}`
-                const edgePieces = ["s8", "s16", "s24", "s32", "s7", "s6", "s5"]
-                if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
-                  if(!edgePieces.includes(piece.currentSquare)) {
-                    piece.captures[parseInt(piece.currentSquare.slice(1)) - 7] = availableMovesForSquares[piece.currentSquare][player][1]
-                  }
-                }
-              } else {
-                const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) + 9}`
-                const edgePieces = ["s8", "s16", "s24", "s27", "s26", "s25"]
-                if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
-                  if(!edgePieces.includes(piece.currentSquare)) {
-                    piece.captures[parseInt(piece.currentSquare.slice(1)) + 9] = availableMovesForSquares[piece.currentSquare][player][1]
-                  }
-                }
+            }
+          } else {
+            const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) + 7}`
+            const edgePieces = ["s1", "s9", "s17", "s25", "s26", "s27", "s28"]
+            if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
+              if(!edgePieces.includes(piece.currentSquare)){
+                piece.captures[parseInt(piece.currentSquare.slice(1)) + 7]
+                = availableMovesForSquares[piece.currentSquare].at(index)[0]
+              }
+            }
+          }
+        } else { 
+          if(index === 0) {
+            const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) - 7}`
+            const edgePieces = ["s8", "s16", "s24", "s32", "s7", "s6", "s5"]
+            if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
+              if(!edgePieces.includes(piece.currentSquare)) {
+                piece.captures[parseInt(piece.currentSquare.slice(1)) - 7]
+                = availableMovesForSquares[piece.currentSquare].at(index)[1]
+              }
+            }
+          } else {
+            const adjacentPiece = `s${parseInt(piece.currentSquare.slice(1)) + 9}`
+            const edgePieces = ["s8", "s16", "s24", "s27", "s26", "s25"]
+            if(totalPieces.every(piece => piece.currentSquare !== adjacentPiece)) {
+              if(!edgePieces.includes(piece.currentSquare)) {
+                piece.captures[parseInt(piece.currentSquare.slice(1)) + 9]
+                = availableMovesForSquares[piece.currentSquare].at(index)[1]
               }
             }
           }
@@ -147,16 +169,13 @@ const generateAvailableMoves = (currentPlayerPieces, opponentPieces) => {
       }
     }
   }
-  if(currentPlayerPieces.every(piece => Object.keys(piece.captures).length === 0)) {
-    for(let piece of currentPlayerPieces) {
-      if(piece.currentSquare) {
-        for(let square of availableMovesForSquares[piece.currentSquare][player]) {
-          if(square) {
-            if(totalPieces.every(piece => piece.currentSquare !== `s${square}`)) {
-              piece.availableMoves.push(square)
-            }
-          }
-        }
+}
+
+const getNormalMoves = (piece, index) => {
+  for(let square of availableMovesForSquares[piece.currentSquare].at(index)) {
+    if(square) {
+      if(totalPieces.every(piece => piece.currentSquare !== `s${square}`)) {
+        piece.availableMoves.push(square)
       }
     }
   }
@@ -168,7 +187,7 @@ const createPieceEventListeners = () => {
     piece.addEventListener("click", (event) => {
       event.stopPropagation()
       selection = piece.parentElement.id
-      for(let piece of playerOnePieces.concat(playerTwoPieces)) {
+      for(let piece of totalPieces) {
         if(piece.currentSquare === selection){
           chosenPiece = piece
         }
@@ -197,7 +216,7 @@ const createSquareEventListeners = () => {
 const isLegalMove = (chosenPiece, square) => {
   if(Object.keys(chosenPiece.captures).length !== 0) {
     if((parseInt(square.id.slice(1))) in chosenPiece.captures) {
-      for(let piece of playerOnePieces.concat(playerTwoPieces)) {
+      for(let piece of totalPieces) {
         if(piece.currentSquare === `s${chosenPiece.captures[square.id.slice(1)]}`) {
           piece.isInPlay = false
           piece.currentSquare = null
