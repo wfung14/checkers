@@ -68,3 +68,15 @@ html {
 .player-two-piece {
   background-color: var(--player-two-piece-color);
 }
+
+.king {
+  color: gold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+}
+
+.king i {
+  position: absolute;
+}

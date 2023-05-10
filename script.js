@@ -74,6 +74,10 @@ const renderBoard = () => {
       const square = document.querySelector(`#${piece.currentSquare}`)
       square.appendChild(playerPiece)
       playerPiece.classList.add("player-one-piece", "piece")
+      if(piece.isNowKing) {
+        playerPiece.classList.add("king")
+        playerPiece.innerHTML = '<i class="fa-solid fa-crown"></i>'
+      }
     }
   }
   for(let piece of playerTwoPieces) {
@@ -82,6 +86,10 @@ const renderBoard = () => {
       const square = document.querySelector(`#${piece.currentSquare}`)
       square.appendChild(playerPiece)
       playerPiece.classList.add("player-two-piece", "piece")
+      if(piece.isNowKing) {
+        playerPiece.classList.add("king")
+        playerPiece.innerHTML = '<i class="fa-solid fa-crown"></i>'
+      }
     }
   }
 }
@@ -141,7 +149,7 @@ const generateAvailableMoves = (currentPlayerPieces, opponentPieces) => {
   }
   if(currentPlayerPieces.every(piece => Object.keys(piece.captures).length === 0)) {
     for(let piece of currentPlayerPieces) {
-      if(piece.currentSquare) {
+          if(piece.currentSquare) {
         for(let square of availableMovesForSquares[piece.currentSquare][player]) {
           if(square) {
             if(totalPieces.every(piece => piece.currentSquare !== `s${square}`)) {
@@ -173,10 +181,11 @@ const createSquareEventListeners = () => {
   for(let square of squares) {
     square.addEventListener("click", () => {
       if(chosenPiece) {
-            if(isLegalMove(chosenPiece, square)) {
+        if(isLegalMove(chosenPiece, square)) {
           chosenPiece.currentSquare = square.id
-          renderBoard()
           chosenPiece = null
+          checkForKing()
+          renderBoard()
           createPieceEventListeners()
           switchTurn()
         }
@@ -199,6 +208,21 @@ const isLegalMove = (chosenPiece, square) => {
   } else {
     if(chosenPiece.availableMoves.includes(parseInt(square.id.slice(1)))) {
       return true
+    }
+  }
+}
+
+const checkForKing = () => {
+  const playerOneKingSquares = ["s1", "s2", "s3", "s4"]
+  const playerTwoKingSquares = ["s29", "s30", "s31", "s32"]
+  for(let piece of playerOnePieces) {
+    if(playerOneKingSquares.includes(piece.currentSquare)) {
+      piece.isNowKing = true
+    }
+  }
+  for(let piece of playerTwoPieces) {
+    if(playerTwoKingSquares.includes(piece.currentSquare)) {
+      piece.isNowKing = true
     }
   }
 }
