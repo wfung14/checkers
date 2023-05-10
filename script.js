@@ -149,7 +149,7 @@ const generateAvailableMoves = (currentPlayerPieces, opponentPieces) => {
   }
   if(currentPlayerPieces.every(piece => Object.keys(piece.captures).length === 0)) {
     for(let piece of currentPlayerPieces) {
-          if(piece.currentSquare) {
+      if(piece.currentSquare) {
         for(let square of availableMovesForSquares[piece.currentSquare][player]) {
           if(square) {
             if(totalPieces.every(piece => piece.currentSquare !== `s${square}`)) {

@@ -10,7 +10,7 @@ html {
 
 :root {
   --dark-square-color: black;
-  --player-two-piece-color: white;
+  --player-two-piece-color: darkgrey;
   --player-one-piece-color: red;
 }
 
