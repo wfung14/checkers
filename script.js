@@ -5,6 +5,7 @@ const playerTwo = document.querySelector("#player-two")
 let playerOnePieces = []
 let playerTwoPieces = []
 let totalPieces = []
+ let justCaptured = false
 
 let player = 0
 let chosenPiece = null
@@ -16,7 +17,7 @@ class PlayerPiece {
     this.isNowKing = false
     this.captures = null
     this.availableMoves = []
-    this.justCaptured = false
+    this.justKinged = false
   }
 }
 
@@ -200,26 +201,23 @@ const createSquareEventListeners = () => {
       if(chosenPiece) {
         if(isLegalMove(chosenPiece, square)) {
           makeTurn(square)
-          if(totalPieces.every(piece => piece.justCaptured === false)) {
-            chosenPiece = null
+          if(!justCaptured) {
             switchTurn()
           } else {
+            justCaptured = false
             for(piece of totalPieces) {
               piece.availableMoves = []
               piece.captures = {}
-              if(!chosenPiece.isNowKing) {
+              if(!chosenPiece.justKinged) {
                 player === 0 ? getCaptureMoves(chosenPiece, playerTwoPieces, player)
-                : getCaptureMoves(chosenPiece, playerOnePieces, player)
-              } else {
-                player === 0 ? getCaptureMoves(chosenPiece, playerTwoPieces, player - 1)
-                : getCaptureMoves(chosenPiece, playerOnePieces, player - 1)
+                  : getCaptureMoves(chosenPiece,playerTwoPieces, player)
+                  if(chosenPiece.isNowKing) {
+                  player === 0 ? getCaptureMoves(chosenPiece, playerTwoPieces, player - 1)
+                  : getCaptureMoves(chosenPiece, playerOnePieces, player - 1)
+                }
               }
             }
-            for(let piece of totalPieces) {
-              piece.justCaptured = false
-            }
             if(totalPieces.every(piece => Object.keys(piece.captures).length === 0)) {
-              chosenPiece = null
               switchTurn()
             }
           }
@@ -245,7 +243,7 @@ const isLegalMove = (chosenPiece, square) => {
           piece.currentSquare = null
         }
       }
-      chosenPiece.justCaptured = true
+      justCaptured = true
       return true
     }
   } else {
@@ -261,16 +259,23 @@ const checkForKing = () => {
   for(let piece of playerOnePieces) {
     if(playerOneKingSquares.includes(piece.currentSquare)) {
       piece.isNowKing = true
+      piece.justKinged = true
     }
   }
   for(let piece of playerTwoPieces) {
     if(playerTwoKingSquares.includes(piece.currentSquare)) {
       piece.isNowKing = true
+      piece.justKinged = true
     }
   }
 }
 
 const switchTurn = () => {
+  for(let piece of totalPieces) {
+    piece.justKinged = false
+  }
+  justCaptured = false
+  chosenPiece = null
   if(player === 0){
     player = 1
     playerTwo.style.color = "green"
