@@ -305,18 +305,23 @@ restartButton.addEventListener("click", () => {
 })
 
 const checkForGameOver = () => {
-  if(player === 0) {
+  if(totalPieces.every(piece => piece.availableMoves.length === 0
+    && totalPieces.every(piece => Object.keys(piece.captures).length === 0)
+    && playerOnePieces.some(piece => piece.isInPlay)
+    && playerTwoPieces.some(piece => piece.isInPlay))) {
+      winnerText.innerText = "Tie game"
+    } else if(player === 0) {
       if(playerOnePieces.every(piece => piece.availableMoves.length === 0
       && playerOnePieces.every(piece => Object.keys(piece.captures).length === 0))){
-          winnerText.innerText = "Player Two Wins"
+        winnerText.innerText = "Player Two Wins"
       }
-  } else {
+    } else {
       if(playerTwoPieces.every(piece => piece.availableMoves.length === 0
       && playerTwoPieces.every(piece => Object.keys(piece.captures).length === 0))){
-          winnerText.innerText = "Player One Wins"
+        winnerText.innerText = "Player One Wins"
       }
+    }
   }
-}
 
 const initialize = () => {
   createUserPieces()
