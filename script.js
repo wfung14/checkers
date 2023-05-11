@@ -1,12 +1,13 @@
 const squares = document.querySelectorAll(".square")
 const playerOne = document.querySelector("#player-one")
 const playerTwo = document.querySelector("#player-two")
+const restartButton = document.querySelector("#restart-button")
+const winnerText = document.querySelector("#winner-text")
 
 let playerOnePieces = []
 let playerTwoPieces = []
 let totalPieces = []
- let justCaptured = false
-
+let justCaptured = false
 let player = 0
 let chosenPiece = null
 
@@ -257,13 +258,15 @@ const checkForKing = () => {
   const playerOneKingSquares = ["s1", "s2", "s3", "s4"]
   const playerTwoKingSquares = ["s29", "s30", "s31", "s32"]
   for(let piece of playerOnePieces) {
-    if(playerOneKingSquares.includes(piece.currentSquare)) {
+    if(playerOneKingSquares.includes(piece.currentSquare)
+      && !piece.isNowKing) {
       piece.isNowKing = true
       piece.justKinged = true
     }
   }
   for(let piece of playerTwoPieces) {
-    if(playerTwoKingSquares.includes(piece.currentSquare)) {
+    if(playerTwoKingSquares.includes(piece.currentSquare)
+      && !piece.isNowKing) {
       piece.isNowKing = true
       piece.justKinged = true
     }
@@ -286,6 +289,32 @@ const switchTurn = () => {
     playerTwo.style.color = "black"
     playerOne.style.color = "green"
     generateAvailableMoves(playerOnePieces, playerTwoPieces)
+  }
+  checkForGameOver()
+}
+
+restartButton.addEventListener("click", () => {
+  winnerText.innerHTML = ""
+  playerOnePieces = []
+  playerTwoPieces = []
+  totalPieces = []
+  player = 0
+  playerTwo.style.color = "black"
+  playerOne.style.color = "green"
+  initialize()
+})
+
+const checkForGameOver = () => {
+  if(player === 0) {
+      if(playerOnePieces.every(piece => piece.availableMoves.length === 0
+      && playerOnePieces.every(piece => Object.keys(piece.captures).length === 0))){
+          winnerText.innerText = "Player Two Wins"
+      }
+  } else {
+      if(playerTwoPieces.every(piece => piece.availableMoves.length === 0
+      && playerTwoPieces.every(piece => Object.keys(piece.captures).length === 0))){
+          winnerText.innerText = "Player One Wins"
+      }
   }
 }
 
