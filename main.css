@@ -9,13 +9,13 @@ body {
 h1 {
   font-size: 4.5rem;
   padding: 10px;
-  width: 37vh
+  width: 24vw;
 }
 
 h2 {
   font-size: 2.5rem;
   padding: 10px;
-  width: 13vh;
+  width: 9vw;
 }
 
 ol {
@@ -23,6 +23,8 @@ ol {
   text-align: left;
   padding-top: 10px;
   padding-bottom: 10px;
+  padding-right: 10px;
+  width: 45vw;
 }
 
 button {
